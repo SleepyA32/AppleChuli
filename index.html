@@ -54,3 +54,113 @@
         video {
             width: 100%;
             aspect-ratio: 16 / 9;
+            background: #000;
+            display: block;
+        }
+
+        .info {
+            padding: 20px;
+        }
+        .filename {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 8px;
+        }
+        .meta {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        #status {
+            text-align: center;
+            padding: 40px;
+            color: #818cf8;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AppleChuli</h1>
+        <p class="subtitle">Latest Clips & Highlights</p>
+    </header>
+
+    <div id="status">Scanning R2 Bucket for clips...</div>
+
+    <div class="grid" id="gallery"></div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const R2_DOMAIN = "https://cdn.chuliapple.com"; 
+
+        async function loadClips() {
+            const gallery = document.getElementById('gallery');
+            const status = document.getElementById('status');
+            
+            try {
+                // 1. Fetch the list from our Cloudflare Function
+                const response = await fetch('/functions/clips');
+                
+                // If the function is missing or broken, throw an error
+                if (!response.ok) {
+                    throw new Error(`Cloudflare Function Error: ${response.status}`);
+                }
+
+                const files = await response.json();
+
+                // Clear the loading text
+                status.style.display = 'none';
+
+                // Check if the bucket is empty
+                if (!files || files.length === 0) {
+                    status.style.display = 'block';
+                    status.innerText = "Connected to R2, but no files were found.";
+                    return;
+                }
+
+                // 2. Loop through files and create video cards
+                files.forEach(file => {
+                    // Only show video files (mp4, mov, webm, mkv)
+                    if (file.key.match(/\.(mp4|mov|webm|mkv)$/i)) {
+                        
+                        const videoUrl = `${R2_DOMAIN}/${file.key}`;
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        
+                        card.innerHTML = `
+                            <video controls preload="metadata">
+                                <source src="${videoUrl}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="info">
+                                <div class="filename" title="${file.key}">${file.key}</div>
+                                <div class="meta"> <a href="${videoUrl}" target="_blank" style="color:#818cf8;">Direct Link</a></div>
+                            </div>
+                        `;
+                        gallery.appendChild(card);
+                    }
+                });
+
+                // If files were found but none were videos
+                if (gallery.children.length === 0) {
+                    status.style.display = 'block';
+                    status.innerText = "No video files (.mp4, .mov) found in your bucket.";
+                }
+
+            } catch (err) {
+                console.error("Gallery Error:", err);
+                status.style.display = 'block';
+                status.style.color = '#f87171'; // Red text for error
+                status.innerText = "Error: " + err.message + ". Check Console (F12) for details.";
+            }
+        }
+
+        loadClips();
+    </script>
+</body>
+</html>
