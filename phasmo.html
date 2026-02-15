@@ -51,7 +51,7 @@
             
             try {
                 // Fetch from our NEW function
-                const response = await fetch('/phasmo');
+                const response = await fetch('/api/phasmo');
                 
                 if (!response.ok) throw new Error(`Error: ${response.status}`);
                 const files = await response.json();
