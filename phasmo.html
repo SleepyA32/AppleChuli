@@ -41,16 +41,15 @@
 
     <script>
         // --- CONFIGURATION ---
-        // IMPORTANT: Use the domain for your PHASMO bucket here
-        // If you haven't set a domain for the new bucket yet, you need to do that in R2 settings.
-        const R2_DOMAIN = "phasmophobia.chuliapple.com"; // CHANGE THIS if Phasmo is on a different domain!
+        // FIX: Added 'https://' so the browser knows it's a website address
+        const R2_DOMAIN = "https://phasmophobia.chuliapple.com"; 
 
         async function loadClips() {
             const gallery = document.getElementById('gallery');
             const status = document.getElementById('status');
             
             try {
-                // Fetch from our NEW function
+                // Fetch from our API function
                 const response = await fetch('/api/phasmo');
                 
                 if (!response.ok) throw new Error(`Error: ${response.status}`);
@@ -65,11 +64,16 @@
 
                 files.forEach(file => {
                     if (file.key.match(/\.(mp4|mov|webm|mkv)$/i)) {
+                        
+                        // Now this creates a proper link like: https://phasmophobia.chuliapple.com/file.mp4
                         const videoUrl = `${R2_DOMAIN}/${file.key}`;
+                        
                         const card = document.createElement('div');
                         card.className = 'card';
                         card.innerHTML = `
-                            <video controls preload="metadata"><source src="${videoUrl}" type="video/mp4"></video>
+                            <video controls preload="metadata">
+                                <source src="${videoUrl}" type="video/mp4">
+                            </video>
                             <div class="info">
                                 <div class="filename" title="${file.key}">${file.key}</div>
                                 <div style="margin-top:10px;">
