@@ -1,10 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AppleChuli</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* 1. RESET & BODY - The background setup */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #312e81 100%); /* Deep Blue/Purple Gradient */
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center;     /* Center vertically */
+            overflow: hidden;
+        }
+
+        /* 2. THE CARD - The frosted glass box */
+        .container {
+            background: rgba(255, 255, 255, 0.05); /* Very see-through white */
+            backdrop-filter: blur(10px);           /* The blur effect */
+            -webkit-backdrop-filter: blur(10px);   /* Safari support */
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 3. TEXT STYLES */
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #818cf8, #c084fc); /* Text Gradient */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: #cbd5e1; /* Light gray text */
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* 4. BUTTONS - The links */
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            display: block;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px); /* Moves up slightly */
+            border-color: #818cf8;       /* Glows purple */
+        }
+
+        /* Footer text */
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to AppleChuli</h1>
-    <p>My website is live!</p>
+
+    <div class="container">
+        <h1>AppleChuli</h1>
+        
+        <p>
+            Welcome to my personal space. <br>
+            Hosting via Cloudflare Pages.
+        </p>
+
+        <div class="links">
+            <a href="#" class="btn">My Projects</a>
+            <a href="#" class="btn">R2 Storage</a>
+            <a href="https://github.com/SleepyA32" class="btn">GitHub</a>
+        </div>
+
+        <div class="footer">
+            © 2026 AppleChuli
+        </div>
+    </div>
+
 </body>
 </html>
