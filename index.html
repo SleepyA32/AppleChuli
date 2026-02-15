@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AppleChuli Clips</title>
+    <title>AppleChuli | Clips</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -14,122 +14,43 @@
             color: white;
             min-height: 100vh;
         }
-        h1 {
+        header {
             text-align: center;
+            margin-bottom: 50px;
+        }
+        h1 {
             background: linear-gradient(to right, #818cf8, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 3rem;
-            margin-bottom: 40px;
+            font-size: 3.5rem;
+            margin: 0;
         }
-        
-        /* Grid Layout */
+        .subtitle { color: #94a3b8; margin-top: 10px; }
+
+        /* The Grid */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        /* Video Card Style */
+        /* Video Card */
         .card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             border-color: #818cf8;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
         
         video {
             width: 100%;
-            height: 200px;
-            object-fit: cover; /* Keeps it neat */
-            background: black;
-        }
-
-        .info {
-            padding: 15px;
-        }
-        .filename {
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .download-btn {
-            display: block;
-            margin-top: 10px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #818cf8;
-            text-decoration: none;
-        }
-    </style>
-</head>
-<body>
-
-    <h1>My Clips</h1>
-    <div class="grid" id="gallery">
-        <p style="text-align:center; width:100%;">Loading clips...</p>
-    </div>
-
-    <script>
-        // --- CONFIGURATION ---
-        // CHANGE THIS to your R2 domain (e.g. 'https://media.chuliapple.com')
-        // Do NOT put a slash at the end.
-        const R2_DOMAIN = "https://cdn.chuliapple.com"; 
-        // ---------------------
-
-        async function loadClips() {
-            const gallery = document.getElementById('gallery');
-            
-            try {
-                // 1. Fetch the list from our new function
-                const response = await fetch('/functions/clips');
-                const files = await response.json();
-
-                // 2. Clear "Loading..." text
-                gallery.innerHTML = '';
-
-                // 3. Loop through files and create cards
-                files.forEach(file => {
-                    // Filter: Only show video files (mp4, mov, webm)
-                    if (file.key.match(/\.(mp4|mov|webm|mkv)$/i)) {
-                        
-                        const fileUrl = `${R2_DOMAIN}/${file.key}`;
-
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.innerHTML = `
-                            <video controls preload="metadata">
-                                <source src="${fileUrl}" type="video/mp4">
-                            </video>
-                            <div class="info">
-                                <div class="filename" title="${file.key}">${file.key}</div>
-                                <a href="${fileUrl}" target="_blank" class="download-btn">Open Direct Link</a>
-                            </div>
-                        `;
-                        gallery.appendChild(card);
-                    }
-                });
-
-                if (gallery.innerHTML === '') {
-                    gallery.innerHTML = '<p>No video clips found in the bucket.</p>';
-                }
-
-            } catch (err) {
-                console.error(err);
-                gallery.innerHTML = '<p>Error loading clips. Check console for details.</p>';
-            }
-        }
-
-        loadClips();
-    </script>
-</body>
-</html>
+            aspect-ratio: 16 / 9;
