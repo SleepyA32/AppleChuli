@@ -103,10 +103,10 @@
             const status = document.getElementById('status');
             
             try {
-                // 1. Fetch the list from our Cloudflare Function
+                // 1. Fetch from the Cloudflare Function
+                // We use '/clips' because we confirmed that route works in your browser
                 const response = await fetch('/clips');
                 
-                // If the function is missing or broken, throw an error
                 if (!response.ok) {
                     throw new Error(`Cloudflare Function Error: ${response.status}`);
                 }
@@ -116,7 +116,6 @@
                 // Clear the loading text
                 status.style.display = 'none';
 
-                // Check if the bucket is empty
                 if (!files || files.length === 0) {
                     status.style.display = 'block';
                     status.innerText = "Connected to R2, but no files were found.";
@@ -125,10 +124,13 @@
 
                 // 2. Loop through files and create video cards
                 files.forEach(file => {
-                    // Only show video files (mp4, mov, webm, mkv)
                     if (file.key.match(/\.(mp4|mov|webm|mkv)$/i)) {
                         
                         const videoUrl = `${R2_DOMAIN}/${file.key}`;
+                        
+                        // Clean Title Logic: Removes 'cs2-clips/' from the name
+                        const cleanTitle = file.key.split('/').pop();
+
                         const card = document.createElement('div');
                         card.className = 'card';
                         
@@ -138,24 +140,31 @@
                                 Your browser does not support the video tag.
                             </video>
                             <div class="info">
-                                <div class="filename" title="${file.key}">${file.key}</div>
-                                <div class="meta"> <a href="${videoUrl}" target="_blank" style="color:#818cf8;">Direct Link</a></div>
+                                <div class="filename" title="${file.key}">${cleanTitle}</div>
+                                <div class="meta" style="display:flex; gap:10px; margin-top:5px;">
+                                    <button onclick="navigator.clipboard.writeText('${videoUrl}'); alert('Link copied!')" 
+                                            style="background:#312e81; border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.7rem;">
+                                        Copy Link
+                                    </button>
+                                    <a href="${videoUrl}" target="_blank" style="color:#818cf8; text-decoration:none; font-size:0.75rem; align-self:center;">
+                                        Open Direct
+                                    </a>
+                                </div>
                             </div>
                         `;
                         gallery.appendChild(card);
                     }
                 });
 
-                // If files were found but none were videos
                 if (gallery.children.length === 0) {
                     status.style.display = 'block';
-                    status.innerText = "No video files (.mp4, .mov) found in your bucket.";
+                    status.innerText = "No video files found in your bucket.";
                 }
 
             } catch (err) {
                 console.error("Gallery Error:", err);
                 status.style.display = 'block';
-                status.style.color = '#f87171'; // Red text for error
+                status.style.color = '#f87171';
                 status.innerText = "Error: " + err.message + ". Check Console (F12) for details.";
             }
         }
