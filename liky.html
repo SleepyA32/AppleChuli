@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONFIDENTIAL | Liky</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* DARKER THEME for Private Pages */
+        body { margin: 0; padding: 40px; font-family: 'Outfit', sans-serif; background: linear-gradient(135deg, #1a0505 0%, #2b0a0a 100%); color: #ffcccc; min-height: 100vh; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: #ff4444; font-size: 3.5rem; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        
+        /* Private Navigation (Only links to the other secret page) */
+        nav { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
+        .nav-link { text-decoration: none; color: #884444; font-weight: 700; font-size: 1.2rem; transition: 0.3s; border: 1px solid #441111; padding: 10px 20px; border-radius: 5px; }
+        .nav-link:hover { color: #ff0000; border-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        .active { color: #ff4444; border-color: #ff4444; background: rgba(255, 0, 0, 0.1); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; }
+        .card { background: rgba(0, 0, 0, 0.3); border: 1px solid #441111; border-radius: 20px; overflow: hidden; }
+        video { width: 100%; aspect-ratio: 16 / 9; background: #000; display: block; }
+        .info { padding: 20px; }
+        .filename { font-weight: 500; color: #ffcccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #status { text-align: center; padding: 40px; color: #ff4444; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>TOP SECRET: LIKY</h1>
+    </header>
+
+    <nav>
+        <a href="/liky" class="nav-link active">PRV: Liky</a>
+        <a href="/fruit" class="nav-link">PRV: Fruit</a>
+    </nav>
+
+    <div id="status">Authenticating...</div>
+    <div class="grid" id="gallery"></div>
+
+    <script>
+        const R2_DOMAIN = "https://liky.chuliapple.com"; // Your custom domain
+
+        async function loadClips() {
+            const gallery = document.getElementById('gallery');
+            const status = document.getElementById('status');
+            try {
+                const response = await fetch('/api/liky'); // Fetch from liky.js
+                if (!response.ok) throw new Error(`Error: ${response.status}`);
+                const files = await response.json();
+                status.style.display = 'none';
+
+                if (!files || files.length === 0) { status.innerText = "No files found."; return; }
+
+                files.forEach(file => {
+                    if (file.key.match(/\.(mp4|mov|webm|mkv)$/i)) {
+                        const videoUrl = `${R2_DOMAIN}/${file.key}`;
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <video controls preload="metadata"><source src="${videoUrl}" type="video/mp4"></video>
+                            <div class="info"><div class="filename" title="${file.key}">${file.key}</div></div>
+                        `;
+                        gallery.appendChild(card);
+                    }
+                });
+            } catch (err) { console.error(err); status.innerText = "Access Denied / Error."; }
+        }
+        loadClips();
+    </script>
+</body>
+</html>
