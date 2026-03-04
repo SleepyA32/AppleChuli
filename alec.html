@@ -1,53 +1,133 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppleChuli | Alec</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Gold/Yellow Theme for Alec */
+        body { margin: 0; padding: 40px; font-family: 'Outfit', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #111827 100%); color: white; min-height: 100vh; }
+        header { text-align: center; margin-bottom: 20px; }
+        h1 { background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3.5rem; margin: 0; }
+        
+        /* Navigation */
+        nav { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .nav-link { text-decoration: none; color: #94a3b8; font-weight: 500; font-size: 1rem; padding: 5px 10px; transition: 0.3s; }
+        .nav-link:hover { color: #fff; }
+        .active { color: #fbbf24 !important; border-bottom: 2px solid #fbbf24; }
+
+        /* Search Bar */
+        .search-container { max-width: 600px; margin: 0 auto 40px auto; }
+        #searchInput {
+            width: 100%; padding: 15px 25px; border-radius: 30px; border: 1px solid rgba(251, 191, 36, 0.3);
+            background: rgba(255, 255, 255, 0.05); color: white; font-size: 1.1rem; font-family: 'Outfit', sans-serif;
+            outline: none; transition: 0.3s; backdrop-filter: blur(10px); box-sizing: border-box;
+        }
+        #searchInput:focus { border-color: #fbbf24; box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; }
+        .card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; overflow: hidden; transition: 0.3s; backdrop-filter: blur(10px); }
+        .card:hover { transform: translateY(-8px); border-color: #fbbf24; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        video { width: 100%; aspect-ratio: 16 / 9; background: #000; display: block; }
+        .info { padding: 20px; }
+        .filename { font-weight: 500; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        #status { text-align: center; padding: 40px; color: #fbbf24; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Alec's Clips</h1>
+    </header>
+
+    <nav>
+        <a href="/" class="nav-link">CS2</a>
+        <a href="/phasmo" class="nav-link">Phasmophobia</a>
+        <a href="/fortnite" class="nav-link">Fortnite</a>
+        <a href="/osu" class="nav-link">osu!</a>
+        <a href="/alec" class="nav-link active">Alec</a>
+    </nav>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search Alec's clips by name...">
+    </div>
+
+    <div id="status">Scanning folders...</div>
+    <div class="grid" id="gallery"></div>
+
+    <script>
         const R2_DOMAIN = "https://su.chuliapple.com"; 
+        let allClips = []; 
 
         async function loadClips() {
             const gallery = document.getElementById('gallery');
             const status = document.getElementById('status');
             
             try {
+                // Fetch from the specific Alec API
                 const response = await fetch('/api/alec');
                 if (!response.ok) throw new Error(`Error: ${response.status}`);
                 const files = await response.json();
                 status.style.display = 'none';
 
                 if (!files || files.length === 0) {
-                    status.innerText = "No clips found in this bucket!";
+                    status.innerText = "Bucket is empty!";
                     return;
                 }
 
-                files.forEach(file => {
-                    // Check if the file is a video
-                    if (file.key.match(/\.(mp4|mov|webm|mkv)$/i)) {
-                        
-                        // The full URL including folders (e.g., su.chuliapple.com/folder/clip.mp4)
-                        const videoUrl = `${R2_DOMAIN}/${file.key}`;
-                        
-                        // This "Cleans" the title. 
-                        // It takes 'folder/clip.mp4' and turns it into just 'clip.mp4'
-                        const cleanTitle = file.key.split('/').pop();
-
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.innerHTML = `
-                            <video controls preload="metadata">
-                                <source src="${videoUrl}" type="video/mp4">
-                            </video>
-                            <div class="info">
-                                <div class="filename" title="${file.key}">${cleanTitle}</div>
-                                <div style="margin-top:10px;">
-                                    <a href="${videoUrl}" target="_blank" style="color:#fbbf24; text-decoration:none; font-size:0.8rem;">Direct Link</a>
-                                </div>
-                            </div>
-                        `;
-                        gallery.appendChild(card);
-                    }
-                });
+                // Filter for videos
+                allClips = files.filter(file => file.key.match(/\.(mp4|mov|webm|mkv)$/i));
+                displayClips(allClips);
 
             } catch (err) {
                 console.error(err);
                 status.innerText = "Error loading Alec's clips.";
             }
         }
+
+        function displayClips(clipsToShow) {
+            const gallery = document.getElementById('gallery');
+            const status = document.getElementById('status');
+            gallery.innerHTML = ''; 
+
+            if (clipsToShow.length === 0) {
+                status.style.display = 'block';
+                status.innerText = "No clips match your search.";
+                return;
+            }
+
+            status.style.display = 'none';
+
+            clipsToShow.forEach(file => {
+                const videoUrl = `${R2_DOMAIN}/${file.key}`;
+                const cleanTitle = file.key.split('/').pop();
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <video controls preload="metadata"><source src="${videoUrl}" type="video/mp4"></video>
+                    <div class="info">
+                        <div class="filename" title="${file.key}">${cleanTitle}</div>
+                        <div style="margin-top:10px;">
+                            <a href="${videoUrl}" target="_blank" style="color:#fbbf24; text-decoration:none; font-size:0.8rem;">Direct Link</a>
+                        </div>
+                    </div>
+                `;
+                gallery.appendChild(card);
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = allClips.filter(clip => clip.key.toLowerCase().includes(searchTerm));
+            displayClips(filtered);
+        });
+
         loadClips();
     </script>
+</body>
+</html>
